@@ -1,0 +1,257 @@
+{% extends "layout.html" %}
+
+{% block title %}
+<title>Úkolníček</title>
+{% endblock %}
+
+{% block top %}
+<script type="application/javascript">
+    ACTIVE_TASK_ID = "";
+
+    function tableStart() {
+        var startTable =  "<table class=\"table table-bordered\">\n" +
+            "<tbody>\n";
+        return startTable;
+    }
+
+    function addRow(name, value) {
+        var row = "<tr>\n" +
+            "        <th>"+ name +"</th>\n" +
+            "        <td>"+ value +"</td>\n" +
+            "      </tr>\n";
+        return row;
+    }
+
+    function tableEnd() {
+        var endTable =   "    </tbody>\n" +
+            "  </table>";
+        return endTable;
+    }
+
+    function prepareModal(task, taskId) {
+        var modalBody = document.getElementById("taskdescription");
+
+        document.getElementById("modalTitle").innerText = task.title;
+
+        var table = tableStart();
+
+        table += addRow('Autor', task.author);
+        table += addRow('Řešitel', task.solver);
+        table += addRow('Vytvořeno', task.created);
+        table += addRow('Stav', task.state);
+        table += tableEnd();
+
+        if(task.state === 'ACTIVE') {
+            $("#deleteTask").show();
+            $("#finishTask").show();
+        } else {
+            $("#deleteTask").hide();
+            $("#finishTask").hide();
+        }
+
+        modalBody.innerHTML = table;
+    }
+
+    function showTaskDescription(taskId) {
+        $.post("/api/getTask",
+            {
+                taskId: taskId
+            },
+            function(data, status){
+                prepareModal(data.task[0],taskId);
+                $("#myModal").show();
+            });
+    }
+
+    function deleteTsk(taskId) {
+        $.post("/api/deleteTask",
+            {
+                taskId: taskId
+            },
+            function(data, status){
+                location.reload();
+            });
+    }
+
+    function getFilterValues() {
+        var filters = document.getElementsByClassName("filter");
+        var filterList = [];
+        for(var i = 0; i < filters.length; i++) {
+            if(filters[i].checked) {
+                filterList.push(filters[i].value);
+            }
+        }
+        return filterList;
+    }
+
+    function prepareCard(task) {
+        var karta = "<div class=\"card bordered\">\n";
+        if (task.state === 'ACTIVE'){
+            karta = karta + "<div class=\"card-body text-center rounded shadow border border-danger activeBg\">\n"; /*activeBg*/
+        }
+        else
+        {
+            karta = karta + "<div class=\"card-body text-center rounded shadow border border-success completeBg\">\n"; /*completeBg*/
+        }
+
+        karta = karta +
+            "                     <div id=\""+task._id+"\" class=\"task\">\n" +
+            "                        <h3 class=\"card-text\">\n" +
+            "                            " + task.title + "\n" +
+            "                        </h3>\n" +
+            "                        <p>" + task.solver +"</p>\n" +
+            "                    </div>\n" +
+            "                </div>\n" +
+            "            </div>";
+        return karta;
+    }
+
+    function fiteredTask() {
+        var array = getFilterValues();
+        $.post("/api/getTasks",
+            {
+                "filter" : array
+            },
+            function(data, status){
+                var cardContainer = document.getElementById("taskContainer");
+                cardContainer.innerHTML = "";
+                for(var i = 0; i < data.task.length; i++) {
+                    cardContainer.innerHTML += prepareCard(data.task[i]);
+                }
+                console.log(data);
+                if(data.task.length == 0) {
+                    cardContainer.innerHTML =  '<h4 class="nadpis">Podle zadaneho filtru, nebyly nalezeny žádné úkoly.</h4>';
+                } else {
+                    $(".task").click(function (e) {
+                        ACTIVE_TASK_ID = e.currentTarget.id;
+                        showTaskDescription(e.currentTarget.id);
+                    });
+                }
+            });
+    }
+
+    function completeTask(taskId) {
+        $.post("/api/completeTask",
+            {
+                taskId: taskId
+            },
+            function(data, status){
+                location.reload();
+            });
+    }
+
+    $(document).ready(function () {
+        $(".task").click(function (e) {
+            ACTIVE_TASK_ID = e.currentTarget.id;
+            showTaskDescription(e.currentTarget.id);
+        });
+
+        $("#deleteTask").click(function(e) {
+                deleteTsk(ACTIVE_TASK_ID);
+            }
+        );
+        $("#finishTask").click(function () {
+            completeTask(ACTIVE_TASK_ID);
+        });
+        $("#editTask").click(function () {
+            $("#myModal").hide();
+            window.location = "/editTask?taskid=" + ACTIVE_TASK_ID;
+        });
+
+        $("#hideModal").click(function () {
+            $("#myModal").hide();
+        });
+
+        $(".filter").click(fiteredTask);
+    });
+</script>
+<nav class="navbar navbar-expand-sm navbar-dark bg-dark sticky-top"> <!--bg-navigace -->
+    <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <p class="navbar-brand uzivatel" class="nav-link" >Uživatel: {{session.loggedUser.username}}</p>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/newTask" >Nový úkol</a>
+            </li>
+        </ul>
+    </div>
+    <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item float-right">
+                    <a class="nav-link" href="/logout" >Odhlásit se</a>
+                </li>
+            </ul>
+    </div>
+</nav>
+{% endblock %}
+{% block main %}
+<div class="card-body">
+    <h4 class="card-title">Filter</h4>
+    <div class="form-check-inline">
+        <label class="form-check-label">
+            <input id="activeCheck" type="checkbox" class="filter form-check-input" value="ACTIVE">Aktivní
+        </label>
+    </div>
+    <div class="form-check-inline">
+        <label class="form-check-label">
+            <input type="checkbox" class="filter form-check-input" value="COMPLETED">Vyřešené
+        </label>
+    </div>
+</div>
+
+
+<div id="taskContainer">
+
+    {% if (activeCheck.checked) %}
+        {% if tasks.length%}
+        {%else%}
+            <h4 class="nadpis">Uživatel {{session.loggedUser.username}} nemá žádné úkoly</h4>
+        {%endif%}
+    {%else%}
+    <h4 class="nadpis">Zde se zobrazí úkoly</h4>
+    {%endif%}
+
+    {% for task in tasks %}
+
+    <div class="card bordered">
+        <div class="card-body text-center completeBg">
+            <div id="{{task._id}}" class="task">
+                <h3 class="card-text">
+                    {{task.title}}
+                </h3>
+                <p>{{ task.solver }}</p>
+            </div>
+        </div>
+    </div>
+
+    {% endfor %}
+</div>
+
+<!-- The Modal -->
+<div class="modal" id="myModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header" >
+                <h4 class="modal-title" id="modalTitle">Modal Heading</h4>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body" id="taskdescription">
+
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer" id="modalFooter">
+                <button id="editTask" type="button" class="btn btn-danger">Upravit!</button>
+                <button id="finishTask" type="button" class="btn btn-danger">Hotovo!</button>
+                <button id="deleteTask" type="button" class="btn btn-danger">Smazat</button>
+                <button id="hideModal" type="button" class="btn btn-danger">Zavřít okno</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

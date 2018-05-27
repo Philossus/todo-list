@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+
+{% block title %}
+<title>Nový úkol</title>
+{% endblock %}
+
+{% block top %}
+<h1 class="display-3 nadpis">Nový úkol</h1>
+{% endblock %}
+
+{% block main %}
+
+<main role="main" class="container">
+
+    <form action="/newTask" method="POST">
+        <div class="form-group">
+            <input name="title" type="text" class="form-control" placeholder="jméno" required id="title">
+        </div>
+        <div class="form-group">
+            <label for="title">Řešitel (pokud není stejný jako autor):</label>
+            <select class="solver form-control" name="solver" ></select>
+        </div>
+        <button type="submit" class="btn btn-primary">Přidat</button>
+        <a href="/tasksPage" class="btn btn-secondary float-right">Zpět na vaše úkoly</a>
+    </form>
+
+</main>
+
+<script type="text/javascript">
+    $('.solver').select2({
+        placeholder: 'Pokud není řešitel stejný jako autor, nevyplňujte.',
+        ajax: {
+            url: '/api/user',
+            dataType: 'json',
+            delay: 250,
+            processResults: function (data) {
+                return {
+                    results: data
+                };
+            },
+            cache: true
+        }
+    });
+</script>
+
+{% endblock %}

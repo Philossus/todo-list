@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+
+{% block title %}
+<title>Přihlášení</title>
+{% endblock %}
+
+{% block top %}
+
+        <h1 class="display-3 nadpis">Přihlášení</h1>
+{% endblock %}
+
+{% block main %}
+
+    <form action="/login" method="POST">
+        <div class="form-group">
+            <input name="login" type="text" placeholder="jméno" class="form-control" id="login">
+        </div>
+        <div class="form-group">
+            <input name="password" type="password" placeholder="heslo" class="form-control" id="pwd">
+        </div>
+        <button type="submit" class="btn btn-primary">Přihlásit se</button>
+        <a href="/registrace" class="btn btn-secondary float-right">Registrace</a>
+    </form>
+
+
+{% endblock %}

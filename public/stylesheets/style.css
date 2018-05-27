@@ -1,0 +1,38 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  background-color: #eeeeee !important;
+  /*background-color: #ccffff !important;*/
+}
+
+a {
+  color: #00B7FF;
+}
+
+.nadpis {
+  color: #1888de;
+  margin-bottom: 16px;
+}
+
+.uzivatel {
+  color: #1888de;
+  margin: 0px;
+  font-size: 1.2em;
+}
+
+.form-warning {
+  color:#dc3545;
+}
+
+.bg-navigace{
+  background-color: #74aba3;
+  /*background-color: #77ffe9;*/
+}
+
+.completeBg{
+  background-color: #deffd2;
+}
+
+.activeBg{
+  background-color: #ffcccc;
+}

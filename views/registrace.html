@@ -1,0 +1,87 @@
+{% extends "layout.html" %}
+
+{% block title %}
+<title>Registrace</title>
+{% endblock %}
+
+{% block top %}
+<h1 class="display-3 nadpis">Registrace</h1>
+{% endblock %}
+
+{% block main %}
+
+<script type="application/javascript">
+
+    function showButton() {
+        $(':input[type="submit"]').prop('disabled', false);
+    }
+
+    function hideButton() {
+        $(':input[type="submit"]').prop('disabled', true);
+    }
+
+    function checkPasswords() {
+        var pwd1 = document.getElementById("pwd1").value;
+        var pwd2 = document.getElementById("pwd2").value;
+        if(pwd1 === pwd2) {
+            var info = document.getElementById("info").innerText = "";
+            showButton();
+        } else {
+            var info = document.getElementById("info");
+            info.innerText = "Hesla se neshodují.";
+            hideButton();
+        }
+    }
+
+    function checkLogin() {
+        var login = document.getElementById("login").value;
+        $.post("/api/checkLogin",
+            {
+                username: login
+            },
+            function(data, status){
+                if(data.sucess) {
+                    document.getElementById("infoLogin").innerText = "";
+                    showButton();
+                } else {
+                    hideButton();
+                    var info = document.getElementById("infoLogin");
+                    info.innerText = "Jméno je již obsazeno";
+                }
+            });
+    }
+
+    $(document).ready(
+        function () {
+            $("#pwd1").change(function (e) {
+                checkPasswords();
+            });
+
+            $("#pwd2").change(function (e) {
+                checkPasswords();
+            });
+
+            $("#login").change(function (e) {
+                checkLogin();
+            });
+        }
+    );
+
+</script>
+
+    <form action="/registrace" method="POST">
+        <div class="form-group">
+            <label id="infoLogin" class="text-danger" for="pwd"></label>
+            <input name="login" type="text" placeholder="jméno" class="form-control" id="login">
+        </div>
+        <div class="form-group">
+            <input name="pwd" type="password" placeholder="heslo" class="form-control" id="pwd">
+        </div>
+        <div class="form-group">
+            <input name="pwd2" type="password" placeholder="heslo znovu" class="form-control" id="pwd2">
+            <label id="info" class="text-danger" for="pwd"></label>
+        </div>
+        <button type="submit" id="submit" class="btn btn-primary">Registrovat</button>
+        <a href="/login" class="btn btn-secondary float-right">Zpět na přihlášení</a>
+    </form>
+{% endblock %}

@@ -1,0 +1,23 @@
+{
+  "name": "semestralka",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www"
+  },
+  "dependencies": {
+    "bcrypt": "^2.0.1",
+    "connect-mongo": "^2.0.1",
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.9",
+    "express": "~4.16.0",
+    "express-session": "^1.15.6",
+    "http-errors": "~1.6.2",
+    "mongo-sanitize": "^1.0.0",
+    "mongoose": "^5.0.14",
+    "morgan": "~1.9.0",
+    "nodemon": "^1.17.3",
+    "nunjucks": "^3.1.2",
+    "x-xss-protection": "^1.1.0"
+  }
+}
