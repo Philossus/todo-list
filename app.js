@@ -26,7 +26,7 @@ nunjucks.configure('views', {
 });
 
 // mongoose setup
-let mongoDBUrl = process.env.MONGODB_URI || 'mongodb://'+process.env.MONGODB_USER+':'+process.env.MONGODB_PASSWORD+'@10.128.110.239/'+process.env.MONGODB_DATABASE;
+let mongoDBUrl = process.env.MONGODB_URI || 'mongodb://'+process.env.MONGODB_USER+':'+process.env.MONGODB_PASSWORD+'@172.30.164.111/'+process.env.MONGODB_DATABASE;
 
 mongoose.connect(mongoDBUrl);
 mongoose.Promise = global.Promise;
